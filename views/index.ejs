@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    
+</head>
+<body>
+  <br>
+  <br>
+  <br>
+  <h1 class="text-center text-danger"> SMART VALLEY BACKEND</h1>
+  <br>
+      <form class="container ",
+      action="http://localhost:4000/addProduct",
+      method="POST",
+      enctype="multipart/form-data"
+      >
+      
+      
+      
+
+        <div class="form-group ">
+          <label for="exampleInputEmail1">Product Name </label>
+          <input type="text" class="form-control" id="products" aria-describedby="emailHelp" placeholder="Product Name">
+         
+        </div>
+        <div class="form-group">
+          <label for="exampleInputPassword1">Price</label>
+          <input type="number" class="form-control" id="price" placeholder="Price">
+        </div>
+     
+        <div class="form-group">
+            <label for="exampleFormControlFile1">Example file input</label>
+            <input type="file" class="form-control-file" id="image" name="avatar" >
+          </div>
+        <button  id="addUser" type="submit" class="btn btn-primary">Submit</button>
+      </form>
+     <section >
+         <h1 class="text-center bold text-danger"> Cart Detail</h1>
+         <div class="card w-75 container" id="product" >
+            <div class="card-body">
+         
+             
+              
+            </div>
+          </div>
+        
+          <div class="card w-75 container m-5" id="updateProduct" >
+           
+             
+              
+            </div>
+            <br>
+
+            <br>
+            <br>
+            <br>
+          </div>
+          
+          <div  >
+           
+             
+              
+          </div>
+        </div>
+     </section>
+
+
+
+
+
+      <script>
+        
+
+        //post data to the server
+        const btnAddUser = document.getElementById('addUser');
+        btnAddUser.addEventListener('click',()=>{
+            const name=document.getElementById('products').value;
+            const price=document.getElementById('price').value;
+            const image = document.getElementById('image').value;
+            const user={name,price,image};
+           // console.log(user);
+            // image.addEventListener("change",ev=>{
+            //     const formula = new FormData()
+            //     formula.append("image",ev.target.files)
+            // })
+         
+           //console.log(user);
+        //   //post
+        
+
+
+          fetch('addProduct',{
+              method:'POST',
+              body:JSON.stringify(user),
+              headers:{
+                  "content-type": "Application/json; charset=UTF-8"
+              }
+          })
+          .then(res => res.json())
+          .then(data => {
+           // document.getElementById('userName').innerText=data.name;
+          })
+         })
+
+
+
+         fetch('products')
+         .then(res => res.json())
+         .then(products =>{
+            console.log(products)
+            const container = document.getElementById("product")
+
+            products.forEach(pd => {
+                const p = document.createElement("h1");
+              
+                p.innerHTML = `<strong>Product Name </strong> :  ${pd.name} -- <strong> price </strong> : ${pd.price} 
+                <Button onclick="LoadProduct('${pd._id}')"> Update </Button>
+                <Button onclick="deleteProduct(event,'${pd._id}')" > delete </Button> `
+
+                container.append(p);
+              
+                
+            });
+
+
+           
+         })
+         function LoadProduct(id){
+              fetch(`products/${id}`)
+              .then(res => res.json())
+              .then(data =>{
+                console.log(id)
+                const update = document.getElementById("updateProduct");
+                update.innerHTML = `
+                <h3>Update :<strong>user id </strong> ${data._id}</h3>
+                <input type="text" value=${data.name} id="updateName">
+                <br>
+                <br>
+                <input type="text" value=${data.price} id="updatePrice">
+                <br>
+                <br>
+                <Button onclick="updateAllProduct('${data._id}')">submit</Button>
+                `
+              })
+         }
+          function updateAllProduct(id){
+             const name = document.getElementById("updateName").value;
+             const price = document.getElementById("updatePrice").value;
+
+             const updatedProduct ={id, name, price}
+             console.log(updatedProduct)
+             fetch(`/update/${id}`,
+             {
+              method:'PATCH',
+              headers: {
+                'content-type': 'Application/json' 
+            },
+              body: JSON.stringify(updatedProduct)
+
+             })
+             .then(res => res.json())
+             .then(data => {
+              console.log("updated")
+             })
+          }
+
+
+
+         function deleteProduct(event,id){
+             fetch(`/delete/${id}`,{
+              method:'DELETE',
+
+             })
+             .then(res => res.json())
+             .then(result => {
+                  if(result){
+                    event.target.parentNode.style.display=none;
+                  }
+             })
+          }
+        
+    </script>
+   
+</body>
+</html>
